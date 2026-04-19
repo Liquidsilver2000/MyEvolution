@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architect of Intelligence: The Evolution</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Cormorant+Garamond:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0b0d;
+            --bg-secondary: #0f1114;
+            --bg-tertiary: #15181c;
+            --accent-cyan: #00d4ff;
+            --accent-emerald: #00e5a0;
+            --accent-amber: #ffb800;
+            --accent-blue: #3b82f6;
+            --accent-gold: #d4af37;
+            --text-primary: #ffffff;
+            --text-secondary: #a8b0bc;
+            --text-tertiary: #5a6270;
+            --glass-bg: rgba(20, 26, 38, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* HUD Grid Background */
+        .hud-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.04;
+            background-image: 
+                linear-gradient(rgba(0,212,255,0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,212,255,0.3) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald), var(--accent-amber), var(--accent-gold));
+            z-index: 1000;
+            transform-origin: left;
+            transform: scaleX(0);
+        }
+
+        /* Master Timeline */
+        .master-timeline {
+            position: fixed;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .timeline-track {
+            position: absolute;
+            left: 5px;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-cyan), var(--accent-emerald), var(--accent-amber), var(--accent-gold));
+            border-radius: 1px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            left: 0;
+            transform: translateX(-5px);
+            box-shadow: 0 0 20px var(--accent-cyan);
+            transition: top 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 10;
+        }
+
+        .timeline-years {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+            padding-left: 25px;
+        }
+
+        .timeline-year {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .timeline-year.active {
+            color: var(--accent-cyan);
+            text-shadow: 0 0 15px var(--accent-cyan);
+            font-weight: 500;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 80px 40px 80px 160px;
+            background: radial-gradient(ellipse at center, rgba(0,212,255,0.06) 0%, transparent 60%);
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            z-index: 10;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(48px, 8vw, 96px);
+            font-weight: 700;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 60px;
+            font-style: italic;
+        }
+
+        .objective-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 50px 60px;
+            backdrop-filter: blur(25px);
+            text-align: left;
+            max-width: 850px;
+            margin: 0 auto;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+        }
+
+        .objective-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-amber);
+            margin-bottom: 24px;
+        }
+
+        .objective-text {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 2;
+        }
+
+        /* Career Section */
+        .career-section {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 100px 80px 100px 180px;
+        }
+
+        .section-container {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 100px;
+            align-items: center;
+        }
+
+        .section-content {
+            z-index: 10;
+        }
+
+        .section-year {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            letter-spacing: 4px;
+            margin-bottom: 16px;
+        }
+
+        .section-theme {
+            font-size: 12px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(42px, 5vw, 64px);
+            font-weight: 600;
+            margin-bottom: 28px;
+            line-height: 1.1;
+        }
+
+        .section-narrative {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 35px;
+            font-style: italic;
+        }
+
+        .section-details {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 28px;
+            backdrop-filter: blur(20px);
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--glass-border);
+            font-size: 14px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .visual-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .visual-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(25px);
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+
+        /* Section 1 - Foundation (Emerald) */
+        .section-1 .section-year { color: var(--accent-emerald); }
+        .section-1 .section-theme { color: var(--accent-emerald); }
+        .section-1 .section-narrative { color: var(--text-secondary); }
+        .section-1 { background: radial-gradient(ellipse at 80% 50%, rgba(0,229,160,0.08) 0%, transparent 50%); }
+
+        /* Section 2 - Leadership (Cyan) */
+        .section-2 .section-year { color: var(--accent-cyan); }
+        .section-2 .section-theme { color: var(--accent-cyan); }
+        .section-2 .section-narrative { color: var(--text-secondary); }
+        .section-2 { background: radial-gradient(ellipse at 20% 50%, rgba(0,212,255,0.08) 0%, transparent 50%); }
+
+        /* Section 3 - Analytics (Emerald) */
+        .section-3 .section-year { color: var(--accent-emerald); }
+        .section-3 .section-theme { color: var(--accent-emerald); }
+        .section-3 .section-narrative { color: var(--text-secondary); }
+        .section-3 { background: radial-gradient(ellipse at 80% 50%, rgba(0,229,160,0.08) 0%, transparent 50%); }
+
+        /* Section 4 - Architecture (Blue) */
+        .section-4 .section-year { color: var(--accent-blue); }
+        .section-4 .section-theme { color: var(--accent-blue); }
+        .section-4 .section-narrative { color: var(--text-secondary); }
+        .section-4 { background: radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.1) 0%, transparent 50%); }
+
+        /* Section 5 - Intelligence (Cyan) */
+        .section-5 .section-year { color: var(--accent-cyan); }
+        .section-5 .section-theme { color: var(--accent-cyan); }
+        .section-5 .section-narrative { color: var(--text-secondary); }
+        .section-5 { background: radial-gradient(ellipse at 80% 50%, rgba(0,212,255,0.1) 0%, transparent 50%); }
+
+        /* Section 6 - Academic (Gold) */
+        .section-6 .section-year { color: var(--accent-gold); }
+        .section-6 .section-theme { color: var(--accent-gold); }
+        .section-6 .section-narrative { color: var(--text-secondary); }
+        .section-6 { background: radial-gradient(ellipse at 20% 50%, rgba(212,175,55,0.1) 0%, transparent 50%); }
+
+        /* Transition Panel */
+        .transition-panel {
+            min-height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 40px;
+            position: relative;
+        }
+
+        .transition-arrow {
+            font-size: 40px;
+            margin: 16px 0;
+            opacity: 0.5;
+        }
+
+        .transition-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        /* Footer */
+        .footer {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 40px 100px 160px;
+            background: radial-gradient(ellipse at center, rgba(0,212,255,0.06) 0%, transparent 60%);
+            text-align: center;
+        }
+
+        .footer-tagline {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(40px, 6vw, 72px);
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            line-height: 2;
+            margin-bottom: 50px;
+        }
+
+        .footer-cta {
+            padding: 18px 40px;
+            background: rgba(0,212,255,0.1);
+            border: 1px solid rgba(0,212,255,0.3);
+            border-radius: 100px;
+            font-size: 13px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .master-timeline {
+                display: none;
+            }
+
+            .hero, .career-section, .footer {
+                padding-left: 40px;
+                padding-right: 40px;
+            }
+
+            .section-container {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+
+            .visual-container {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero, .career-section, .footer {
+                padding: 60px 24px;
+            }
+
+            .objective-card {
+                padding: 30px 24px;
+            }
+
+            .visual-card {
+                padding: 30px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HUD Grid -->
+    <div class="hud-grid"></div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Master Timeline -->
+    <div class="master-timeline">
+        <div class="timeline-track"></div>
+        <div class="timeline-marker" id="timelineMarker"></div>
+        <div class="timeline-years">
+            <div class="timeline-year" data-year="1996">1996</div>
+            <div class="timeline-year" data-year="1997">1997</div>
+            <div class="timeline-year" data-year="1998">1998</div>
+            <div class="timeline-year" data-year="2009">2009</div>
+            <div class="timeline-year" data-year="2012">2012</div>
+            <div class="timeline-year" data-year="2015">2015</div>
+            <div class="timeline-year active" data-year="present">Present</div>
+        </div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-badge">The Evolution</div>
+            <h1 class="hero-title">Architect of Intelligence</h1>
+            <p class="hero-subtitle">From financial precision to predictive intelligence</p>
+            
+            <div class="objective-card">
+                <div class="objective-label">Objective</div>
+                <p class="objective-text">
+                    Strategic and results-driven data and banking professional committed to delivering analytical insight, operational excellence, and regulatory integrity across financial institutions. Leveraging deep expertise in banking operations, data systems, and advanced analytics to drive informed decision-making, optimize performance, and strengthen member relationships. Dedicated to upholding the highest standards of compliance, service, and uncompromising ethical leadership.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 1: THE FOUNDATION (1996) -->
+    <section class="career-section section-1" id="section1">
+        <div class="section-container">
+            <div class="section-content">
+                <div class="section-year">1996</div>
+                <div class="section-theme">Precision</div>
+                <h2 class="section-title">The Foundation</h2>
+                <p class="section-narrative">Financial accuracy built discipline.</p>
+                
+                <div class="section-details">
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-emerald);">🏦</div>
+                        <span style="color: var(--text-secondary);">Meridian Bank of Zambia — Bank Teller (Internship)</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-emerald);">✓</div>
+                        <span style="color: var(--text-secondary);">Transaction accuracy & verification protocols</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-emerald);">🔒</div>
+                        <span style="color: var(--text-secondary);">Cash handling & vault discipline</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-emerald);">📋</div>
+                        <span style="color: var(--text-secondary);">Compliance & confidentiality standards</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="visual-container">
+                <div class="visual-card">
+                    <div style="font-size: 72px; margin-bottom: 24px;">🏦</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent-emerald); letter-spacing: 2px; margin-bottom: 16px;">LEDGER VERIFIED</div>
+                    <div style="font-size: 48px; font-weight: 700; color: var(--accent-emerald);">100%</div>
+                    <div style="font-size: 13px; color: var(--text-tertiary); margin-top: 8px;">Transaction Accuracy</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRANSITION 1→2 -->
+    <section class="transition-panel" id="transition1">
+        <div class="transition-label" style="color: var(--text-tertiary);">Precision</div>
+        <div class="transition-arrow" style="color: var(--accent-emerald);">↓</div>
+        <div class="transition-label" style="color: var(--accent-cyan);">Leadership</div>
+    </section>
+
+    <!-- SECTION 2: OPERATIONAL COMMAND (1997-2012) -->
+    <section class="career-section section-2" id="section2">
+        <div class="section-container">
+            <div class="section-content">
+                <div class="section-year">1997 — 2012</div>
+                <div class="section-theme">Leadership & Control</div>
+                <h2 class="section-title">Operational Command</h2>
+                <p class="section-narrative">Operational mastery built structure.</p>
+                
+                <div class="section-details">
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-cyan);">🏛️</div>
+                        <span style="color: var(--text-secondary);">Union Bank — Teller II, III / Customer Service</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-cyan);">👥</div>
+                        <span style="color: var(--text-secondary);">UCF Federal Credit Union — MSR II, III / Team Lead</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-cyan);">📊</div>
+                        <span style="color: var(--text-secondary);">Staff scheduling & performance management</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-cyan);">🛡️</div>
+                        <span style="color: var(--text-secondary);">Security governance & compliance oversight</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="visual-container">
+                <div class="visual-card">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px;">
+                        <div style="padding: 24px; background: rgba(0,212,255,0.08); border-radius: 12px; border: 1px solid rgba(0,212,255,0.2);">
+                            <div style="font-size: 36px; font-weight: 700; color: var(--accent-cyan);">15+</div>
+                            <div style="font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-top: 8px;">Years</div>
+                        </div>
+                        <div style="padding: 24px; background: rgba(0,212,255,0.08); border-radius: 12px; border: 1px solid rgba(0,212,255,0.2);">
+                            <div style="font-size: 36px; font-weight: 700; color: var(--accent-cyan);">20+</div>
+                            <div style="font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-top: 8px;">Staff Managed</div>
+                        </div>
+                    </div>
+                    <div style="padding: 16px; background: rgba(255,255,255,0.03); border-radius: 10px; text-align: center;">
+                        <div style="font-size: 12px; color: var(--text-tertiary); letter-spacing: 2px; text-transform: uppercase;">Operational Excellence</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRANSITION 2→3 -->
+    <section class="transition-panel" id="transition2">
+        <div class="transition-label" style="color: var(--text-tertiary);">Leadership</div>
+        <div class="transition-arrow" style="color: var(--accent-cyan);">↓</div>
+        <div class="transition-label" style="color: var(--accent-emerald);">Analytics</div>
+    </section>
+
+    <!-- SECTION 3: MARKET INTELLIGENCE (1998-1999) -->
+    <section class="career-section section-3" id="section3">
+        <div class="section-container">
+            <div class="section-content">
+                <div class="section-year">1998 — 1999</div>
+                <div class="section-theme">Analytical Leadership</div>
+                <h2 class="section-title">Market Intelligence</h2>
+                <p class="section-narrative">Analytics became strategy.</p>
+                
+                <div class="section-details">
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-emerald);">🌍</div>
+                        <span style="color: var(--text-secondary);">SPAR International South Africa — Analytics Supervisor</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-emerald);">📈</div>
+                        <span style="color: var(--text-secondary);">Led team of 5 analysts across 15 distribution centers</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-emerald);">📊</div>
+                        <span style="color: var(--text-secondary);">KPI dashboards & channel performance visualization</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-emerald);">🎯</div>
+                        <span style="color: var(--text-secondary);">Executive forecasting & strategic reporting</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="visual-container">
+                <div class="visual-card">
+                    <div style="font-size: 64px; margin-bottom: 20px;">🌍</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 56px; font-weight: 700; color: var(--accent-emerald);">15</div>
+                    <div style="font-size: 14px; color: var(--text-tertiary); margin-top: 8px;">Distribution Centers</div>
+                    <div style="margin-top: 24px; padding: 16px; background: rgba(0,229,160,0.1); border-radius: 10px;">
+                        <div style="font-size: 12px; color: var(--accent-emerald); letter-spacing: 2px; text-transform: uppercase;">Global Intelligence</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRANSITION 3→4 -->
+    <section class="transition-panel" id="transition3">
+        <div class="transition-label" style="color: var(--text-tertiary);">Analytics</div>
+        <div class="transition-arrow" style="color: var(--accent-emerald);">↓</div>
+        <div class="transition-label" style="color: var(--accent-blue);">Architecture</div>
+    </section>
+
+    <!-- SECTION 4: ENTERPRISE BI (2012-2015) -->
+    <section class="career-section section-4" id="section4">
+        <div class="section-container">
+            <div class="section-content">
+                <div class="section-year">2012 — 2015</div>
+                <div class="section-theme">System Design</div>
+                <h2 class="section-title">Enterprise BI Architecture</h2>
+                <p class="section-narrative">Reporting systems became infrastructure.</p>
+                
+                <div class="section-details">
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-blue);">🏢</div>
+                        <span style="color: var(--text-secondary);">C.F.E. Federal Credit Union — Lead MSR / Lending Analyst III</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-blue);">📊</div>
+                        <span style="color: var(--text-secondary);">Tableau, Power BI, R dashboard architecture</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-blue);">🗄️</div>
+                        <span style="color: var(--text-secondary);">Data warehouse governance & ETL pipelines</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-blue);">🤝</div>
+                        <span style="color: var(--text-secondary);">Cross-functional stakeholder collaboration</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="visual-container">
+                <div class="visual-card">
+                    <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 24px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 40px; font-weight: 700; color: var(--accent-blue);">50+</div>
+                            <div style="font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-top: 8px;">Dashboards</div>
+                        </div>
+                        <div style="width: 1px; background: var(--glass-border);"></div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 40px; font-weight: 700; color: var(--accent-blue);">5</div>
+                            <div style="font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-top: 8px;">Departments</div>
+                        </div>
+                    </div>
+                    <div style="padding: 16px; background: rgba(59,130,246,0.1); border-radius: 10px; text-align: center;">
+                        <div style="font-size: 12px; color: var(--accent-blue); letter-spacing: 2px; text-transform: uppercase;">Enterprise Data Infrastructure</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRANSITION 4→5 -->
+    <section class="transition-panel" id="transition4">
+        <div class="transition-label" style="color: var(--text-tertiary);">Architecture</div>
+        <div class="transition-arrow" style="color: var(--accent-blue);">↓</div>
+        <div class="transition-label" style="color: var(--accent-cyan);">Intelligence</div>
+    </section>
+
+    <!-- SECTION 5: DATA SCIENCE (2015-Present) -->
+    <section class="career-section section-5" id="section5">
+        <div class="section-container">
+            <div class="section-content">
+                <div class="section-year">2015 — Present</div>
+                <div class="section-theme">Predictive Intelligence</div>
+                <h2 class="section-title">Data Science & Machine Learning</h2>
+                <p class="section-narrative">Intelligence became predictive.</p>
+                
+                <div class="section-details">
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-cyan);">🧠</div>
+                        <span style="color: var(--text-secondary);">Addition Financial — Data Scientist</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-cyan);">🤖</div>
+                        <span style="color: var(--text-secondary);">ML models, recommendation systems, clustering</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-cyan);">📉</div>
+                        <span style="color: var(--text-secondary);">PCA, dimensionality reduction, feature engineering</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-cyan);">🎓</div>
+                        <span style="color: var(--text-secondary);">UCF Panelist — Big Data Analytics Symposium</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="visual-container">
+                <div class="visual-card">
+                    <div style="font-size: 64px; margin-bottom: 20px;">🧠</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 56px; font-weight: 700; color: var(--accent-cyan);">10+</div>
+                    <div style="font-size: 14px; color: var(--text-tertiary); margin-top: 8px;">Years</div>
+                    <div style="margin-top: 24px; padding: 16px; background: rgba(0,212,255,0.1); border-radius: 10px;">
+                        <div style="font-size: 12px; color: var(--accent-cyan); letter-spacing: 2px; text-transform: uppercase;">Predictive Intelligence</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRANSITION 5→6 -->
+    <section class="transition-panel" id="transition5">
+        <div class="transition-label" style="color: var(--text-tertiary);">Intelligence</div>
+        <div class="transition-arrow" style="color: var(--accent-cyan);">↓</div>
+        <div class="transition-label" style="color: var(--accent-gold);">Excellence</div>
+    </section>
+
+    <!-- SECTION 6: ACADEMIC DISTINCTION -->
+    <section class="career-section section-6" id="section6">
+        <div class="section-container">
+            <div class="section-content">
+                <div class="section-year">Academic</div>
+                <div class="section-theme">Intellectual Discipline</div>
+                <h2 class="section-title">Academic Distinction</h2>
+                <p class="section-narrative">Excellence was consistent.</p>
+                
+                <div class="section-details">
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-gold);">🏆</div>
+                        <span style="color: var(--text-secondary);">President's List — 4 Semesters</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-gold);">📜</div>
+                        <span style="color: var(--text-secondary);">Dean's List — 2 Semesters</span>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-icon" style="color: var(--accent-gold);">✨</div>
+                        <span style="color: var(--text-secondary);">Sustained scholastic excellence</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="visual-container">
+                <div class="visual-card">
+                    <div style="display: flex; justify-content: center; gap: 40px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 56px; font-weight: 700; color: var(--accent-gold); text-shadow: 0 0 30px rgba(212,175,55,0.4);">4</div>
+                            <div style="font-size: 12px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-top: 10px;">President's List</div>
+                        </div>
+                        <div style="width: 1px; background: var(--glass-border);"></div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 56px; font-weight: 700; color: var(--accent-gold); text-shadow: 0 0 30px rgba(212,175,55,0.4);">2</div>
+                            <div style="font-size: 12px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-top: 10px;">Dean's List</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 30px; padding: 18px; background: rgba(212,175,55,0.1); border-radius: 10px; text-align: center;">
+                        <div style="font-size: 12px; color: var(--accent-gold); letter-spacing: 2px; text-transform: uppercase;">Consistent Excellence</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer" id="footer">
+        <h2 class="footer-tagline">From financial precision<br>to predictive intelligence.</h2>
+        <p class="footer-subtitle">
+            I pilot planes and data pipelines. Every stage of this journey was intentional.<br>
+            Discipline before intelligence. Operations before algorithms. Leadership before prediction.
+        </p>
+        <div class="footer-cta">The Evolution Continues</div>
+    </footer>
+
+    <script>
+        // Register GSAP plugins
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Progress Bar Animation
+        gsap.to('#progressBar', {
+            scaleX: 1,
+            ease: 'none',
+            scrollTrigger: {
+                trigger: 'body',
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 0.3
+            }
+        });
+
+        // Timeline Marker Animation
+        gsap.to('#timelineMarker', {
+            top: '100%',
+            ease: 'none',
+            scrollTrigger: {
+                trigger: 'body',
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 0.3
+            }
+        });
+
+        // Hero Animations
+        gsap.from('.hero-badge', {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            delay: 0.3,
+            ease: 'power2.out'
+        });
+
+        gsap.from('.hero-title', {
+            opacity: 0,
+            y: 40,
+            duration: 1,
+            delay: 0.5,
+            ease: 'power2.out'
+        });
+
+        gsap.from('.hero-subtitle', {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            delay: 0.7,
+            ease: 'power2.out'
+        });
+
+        gsap.from('.objective-card', {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            delay: 0.9,
+            ease: 'power2.out'
+        });
+
+        // Section Animations
+        const sections = document.querySelectorAll('.career-section');
+        
+        sections.forEach((section) => {
+            const content = section.querySelector('.section-content');
+            const visual = section.querySelector('.visual-container');
+            
+            gsap.from(content, {
+                opacity: 0,
+                x: -50,
+                duration: 1,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top 70%',
+                    toggleActions: 'play none none none'
+                }
+            });
+
+            gsap.from(visual, {
+                opacity: 0,
+                x: 50,
+                duration: 1,
+                delay: 0.2,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top 70%',
+                    toggleActions: 'play none none none'
+                }
+            });
+        });
+
+        // Transition Panel Animations
+        document.querySelectorAll('.transition-panel').forEach(panel => {
+            gsap.from(panel.querySelectorAll('.transition-label, .transition-arrow'), {
+                opacity: 0,
+                y: 20,
+                duration: 0.6,
+                stagger: 0.1,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: panel,
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                }
+            });
+        });
+
+        // Footer Animation
+        gsap.from('.footer-tagline', {
+            opacity: 0,
+            y: 40,
+            duration: 1,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#footer',
+                start: 'top 75%',
+                toggleActions: 'play none none none'
+            }
+        });
+
+        gsap.from('.footer-subtitle', {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            delay: 0.2,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#footer',
+                start: 'top 75%',
+                toggleActions: 'play none none none'
+            }
+        });
+
+        gsap.from('.footer-cta', {
+            opacity: 0,
+            y: 20,
+            duration: 0.6,
+            delay: 0.4,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#footer',
+                start: 'top 75%',
+                toggleActions: 'play none none none'
+            }
+        });
+
+        // Timeline Year Activation
+        const years = document.querySelectorAll('.timeline-year');
+        const yearMap = [
+            { trigger: '#hero', year: 'present' },
+            { trigger: '#section1', year: '1996' },
+            { trigger: '#section2', year: '1997' },
+            { trigger: '#section3', year: '1998' },
+            { trigger: '#section4', year: '2012' },
+            { trigger: '#section5', year: '2015' },
+            { trigger: '#section6', year: 'present' }
+        ];
+
+        yearMap.forEach(({ trigger, year }) => {
+            ScrollTrigger.create({
+                trigger: trigger,
+                start: 'top 60%',
+                onEnter: () => {
+                    years.forEach(y => y.classList.remove('active'));
+                    const activeYear = document.querySelector(`[data-year="${year}"]`);
+                    if (activeYear) activeYear.classList.add('active');
+                },
+                onLeaveBack: () => {
+                    years.forEach(y => y.classList.remove('active'));
+                    const prevIndex = yearMap.findIndex(m => m.trigger === trigger) - 1;
+                    if (prevIndex >= 0) {
+                        const prevYear = document.querySelector(`[data-year="${yearMap[prevIndex].year}"]`);
+                        if (prevYear) prevYear.classList.add('active');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
